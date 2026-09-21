@@ -15,6 +15,8 @@ Prepared September 20, 2026. This package contains source, documentation, test e
 
 The subsequent source-launch correction passes 14 server tests on Node 22.23.2, including invalid-request refusal and health recovery. Browser and hosted receipts above remain historical evidence for the earlier build; the corrected source is not yet the published pilot.
 
+All 41 browser checks were subsequently rerun against that corrected local source and passed, recorded separately in `tests/source-hardening-browser-results.json`. The original hosted receipts remain tied to the older deployment.
+
 ## Coverage and freshness
 
 The September 20 tracker readback contains 268 populated release rows, 4 selected desk reviews, 10 technical events, 8 registered direct-source endpoints, and 29 version/access offerings across 8 groups. These are Gemini Flash, GPT-5.6 variants, Gemini Flash-Lite, OpenAI Python SDK, Step 5, Codex CLI, Hugging Face Hub, and Claude Code. Five groups have documented current-plus-two-predecessor slots; variants and access tiers are not treated as predecessors. These are point-in-time counts, not exhaustive coverage.
@@ -39,9 +41,9 @@ No paid model calls, private-data experiments, production patches, purchases, or
 
 ## Independent review and remediation
 
-The later launch-package review found a request-handling availability blocker. A source-only correction and regression are prepared; merge is held pending independent follow-up and owner authorization. The hosted pilot has not been republished with this correction.
+The later launch-package review found a request-handling availability blocker. A source-only correction and regression passed an independent AI-reviewer follow-up on Node 22.23.2, with no remaining local BLOCK. Merge still requires owner authorization. The hosted pilot has not been republished with this correction.
 
-The independent follow-up returned WARN with no BLOCK findings. It rechecked the server tests, local seven-feed delivery, profile privacy, XSS refusal, input bounds, CSP, accessible sorting, and corrected license labeling.
+The earlier pre-publication independent follow-up returned WARN with no BLOCK findings. It rechecked the server tests, local seven-feed delivery, profile privacy, XSS refusal, input bounds, CSP, accessible sorting, and corrected license labeling. That earlier scope is distinct from the later source-only follow-up above.
 
 The missing-lockfile warning was subsequently addressed by the producer: the package now contains `package-lock.json`, and `npm audit --json` returned zero reported dependency vulnerabilities. This does not audit the Node runtime, hosting platform, or all application logic.
 

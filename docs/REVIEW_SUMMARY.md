@@ -22,9 +22,13 @@ Receipts are `tests/publication-test-results.json` and `tests/publication-produc
 
 ## Independent finding status
 
-The later source-launch review identified a request-handling availability blocker not covered by the original suite. The source package now adds request-target validation, a listener error boundary and a raw-request regression; an independent follow-up is required before merge. This source correction has not been republished to the existing hosted pilot, and the prior production receipts do not verify it.
+The later source-launch review identified a request-handling availability blocker not covered by the original suite. The source package now adds request-target validation, a listener error boundary and a raw-request regression. A separate AI reviewer independently retested the corrected source on Node 22.23.2: 14/14 tests and a separate same-process recovery reproduction passed, yielding WARN with no remaining local BLOCK. This source correction has not been republished to the existing hosted pilot, and the prior production receipts do not verify it.
 
 The source workflow pins reviewed action commit IDs, disables checkout credential persistence and tests Node 22. The optional `examples/stack-profile.json` is a synthetic example with “Example provider” and “Exact product”, not the owner's inventory.
+
+The producer also reran all 41 browser checks against the corrected local source, using the public read-only feeds and synthetic profile inputs; all passed. `tests/source-hardening-browser-results.json` records this separate local run. It does not verify the still-unchanged hosted pilot.
+
+The source-only follow-up verified server SHA-256 `4bdfceab7d0d3ce8b64e48ed549306eec767837c68c6dac74debde76bbf1916e` and test-suite SHA-256 `8a68d9b91f990b799248ee78bf36bc0ae10e51b86712efc4511a82a587db8d02`. It did not independently run the browser checks, inspect remote settings or test production. Owner merge authorization remains a separate gate.
 
 The follow-up reviewed implementation commit `285b45f` and returned WARN with no BLOCK findings. The producer's subsequent commit `41df43b` added the lockfile and an explicit overdue-collection label; the follow-up is not represented as an independent review of that later commit.
 
