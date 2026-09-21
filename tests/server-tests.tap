@@ -1,0 +1,75 @@
+TAP version 13
+# Subtest: health endpoint identifies read-only mode
+ok 1 - health endpoint identifies read-only mode
+  ---
+  duration_ms: 41.354306
+  ...
+# Subtest: HEAD rejection terminates cleanly
+ok 2 - HEAD rejection terminates cleanly
+  ---
+  duration_ms: 5.706781
+  ...
+# Subtest: mutating methods refused
+ok 3 - mutating methods refused
+  ---
+  duration_ms: 6.138299
+  ...
+# Subtest: unapproved feed refused
+ok 4 - unapproved feed refused
+  ---
+  duration_ms: 1.74014
+  ...
+# Subtest: arbitrary source query refused
+ok 5 - arbitrary source query refused
+  ---
+  duration_ms: 1.53501
+  ...
+# Subtest: unapproved files and paths refused
+ok 6 - unapproved files and paths refused
+  ---
+  duration_ms: 6.221642
+  ...
+# Subtest: public CSV cached without credentials and with exposed timestamps
+ok 7 - public CSV cached without credentials and with exposed timestamps
+  ---
+  duration_ms: 6.166734
+  ...
+# Subtest: parallel same-feed requests coalesce
+ok 8 - parallel same-feed requests coalesce
+  ---
+  duration_ms: 34.431071
+  ...
+# Subtest: HTML disguised as CSV refused
+ok 9 - HTML disguised as CSV refused
+  ---
+  duration_ms: 1.912717
+  ...
+# Subtest: wrong content type refused
+ok 10 - wrong content type refused
+  ---
+  duration_ms: 2.495229
+  ...
+# Subtest: oversize feed refused
+ok 11 - oversize feed refused
+  ---
+  duration_ms: 12.0481
+  ...
+# Subtest: upstream exceptions do not reveal internals
+ok 12 - upstream exceptions do not reveal internals
+  ---
+  duration_ms: 2.308667
+  ...
+# Subtest: global request budget refuses excess with retry hint
+ok 13 - global request budget refuses excess with retry hint
+  ---
+  duration_ms: 344.038501
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 522.84279

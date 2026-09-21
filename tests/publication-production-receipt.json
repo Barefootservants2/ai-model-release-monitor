@@ -1,0 +1,153 @@
+{
+  "checked_at": "2026-09-20T19:50:01.962Z",
+  "url": "https://ai-release-notes.pplx.app",
+  "visibility": "Public",
+  "checks": [
+    {
+      "path": "api/health",
+      "method": "GET",
+      "expect": 200,
+      "status": 200,
+      "passed": true
+    },
+    {
+      "path": "api/feeds/unknown",
+      "method": "GET",
+      "expect": 400,
+      "status": 400,
+      "passed": true
+    },
+    {
+      "path": "api/feeds/releases?unexpected=true",
+      "method": "GET",
+      "expect": 400,
+      "status": 400,
+      "passed": true
+    },
+    {
+      "path": "api/feeds/releases",
+      "method": "HEAD",
+      "expect": 405,
+      "status": 405,
+      "passed": true
+    },
+    {
+      "path": "api/feeds/releases",
+      "method": "POST",
+      "expect": 405,
+      "status": 405,
+      "passed": true
+    },
+    {
+      "path": "private-estate-profile.json",
+      "method": "GET",
+      "expect": 404,
+      "status": 404,
+      "passed": true
+    }
+  ],
+  "page_errors": [],
+  "api_base": "port/5000",
+  "feed_delivery": [
+    {
+      "tab": "sources",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.037Z"
+    },
+    {
+      "tab": "meta",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.124Z"
+    },
+    {
+      "tab": "releases",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.242Z"
+    },
+    {
+      "tab": "events",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.164Z"
+    },
+    {
+      "tab": "assessments",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.039Z"
+    },
+    {
+      "tab": "signals",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.160Z"
+    },
+    {
+      "tab": "versions",
+      "delivery": "server",
+      "fetched_at": "2026-09-20T19:49:03.118Z"
+    }
+  ],
+  "csp_meta": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.perplexity.ai https://*.pplx.app; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests",
+  "health": {
+    "status": "ok",
+    "mode": "public-read-only",
+    "cache_seconds": 60
+  },
+  "api_csp": "frame-ancestors 'none'; base-uri 'self'; object-src 'none'",
+  "feed_responses": [
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/sources",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/assessments",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/versions",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/meta",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/signals",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/events",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/releases",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/sources",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/meta",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/releases",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/events",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/assessments",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/signals",
+      "status": 200
+    },
+    {
+      "url": "https://ai-release-notes.pplx.app/port/5000/api/feeds/versions",
+      "status": 200
+    }
+  ]
+}

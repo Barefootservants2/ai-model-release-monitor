@@ -1,0 +1,22 @@
+name: Source checks
+on:
+  push:
+    branches: [main, launch/free-pilot]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and server tests
+        working-directory: app
+        run: |
+          node --check app.js
+          node --check intelligence.js
+          node --check server.cjs
+          node --test test-server.cjs
