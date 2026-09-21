@@ -1,0 +1,166 @@
+[
+  {
+    "label": "All seven live feeds",
+    "passed": true
+  },
+  {
+    "label": "Release and comparison counts",
+    "passed": true
+  },
+  {
+    "label": "CSV embedded commas and quote escaping",
+    "passed": true
+  },
+  {
+    "label": "Eight documented family groups",
+    "passed": true
+  },
+  {
+    "label": "Two Flash predecessors",
+    "passed": true
+  },
+  {
+    "label": "Free access filter",
+    "passed": true
+  },
+  {
+    "label": "Family search",
+    "passed": true
+  },
+  {
+    "label": "Variants not mislabeled predecessors",
+    "passed": true
+  },
+  {
+    "label": "Provider picker produces overlap only",
+    "passed": true
+  },
+  {
+    "label": "Profile triggers no network requests",
+    "passed": true
+  },
+  {
+    "label": "Profile payload cannot execute",
+    "passed": true
+  },
+  {
+    "label": "Profile absent from persistent storage",
+    "passed": true
+  },
+  {
+    "label": "Invalid calendar date rejected",
+    "passed": true
+  },
+  {
+    "label": "Historical provider ignored",
+    "passed": true
+  },
+  {
+    "label": "Stale profile flagged",
+    "passed": true
+  },
+  {
+    "label": "Clear removes profile and selections",
+    "passed": true
+  },
+  {
+    "label": "Synthetic cost arithmetic",
+    "passed": true
+  },
+  {
+    "label": "Migration reverses savings",
+    "passed": true
+  },
+  {
+    "label": "Overflow rejected",
+    "passed": true
+  },
+  {
+    "label": "Unsafe URL rejected",
+    "passed": true
+  },
+  {
+    "label": "Patch filter",
+    "passed": true
+  },
+  {
+    "label": "Mobile width usefulness",
+    "passed": true
+  },
+  {
+    "label": "Active view usefulness",
+    "passed": true
+  },
+  {
+    "label": "Mobile width timeline",
+    "passed": true
+  },
+  {
+    "label": "Active view timeline",
+    "passed": true
+  },
+  {
+    "label": "Mobile width changes",
+    "passed": true
+  },
+  {
+    "label": "Active view changes",
+    "passed": true
+  },
+  {
+    "label": "Mobile width stack",
+    "passed": true
+  },
+  {
+    "label": "Active view stack",
+    "passed": true
+  },
+  {
+    "label": "Mobile width cost",
+    "passed": true
+  },
+  {
+    "label": "Active view cost",
+    "passed": true
+  },
+  {
+    "label": "Mobile width sources",
+    "passed": true
+  },
+  {
+    "label": "Active view sources",
+    "passed": true
+  },
+  {
+    "label": "Mobile width versions",
+    "passed": true
+  },
+  {
+    "label": "Active view versions",
+    "passed": true
+  },
+  {
+    "label": "Unavailable feeds use labeled snapshot",
+    "passed": true
+  },
+  {
+    "label": "No feed or snapshot shows failure",
+    "passed": true
+  },
+  {
+    "label": "Partial feed does not claim full live connection",
+    "passed": true
+  },
+  {
+    "label": "Open-license labels exclude planned proprietary cases",
+    "passed": true
+  },
+  {
+    "label": "Visible main landmark",
+    "passed": true
+  },
+  {
+    "label": "Keyboard sorting announces state",
+    "passed": true
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "as_of": "2026-09-20",
+  "complete": false,
+  "products": [
+    {
+      "org": "Example provider",
+      "name": "Exact product",
+      "version": "1.0",
+      "status": "user-confirmed"
+    }
+  ]
+}

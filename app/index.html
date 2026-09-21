@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.perplexity.ai https://*.pplx.app; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests" />
+<title>AI Model Release Monitor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%237dd3fc' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%237dd3fc'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+      <rect width="32" height="32" rx="6" fill="currentColor" opacity="0.08"/>
+      <circle cx="16" cy="16" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="16" cy="16" r="3.5" fill="currentColor"/>
+      <line x1="16" y1="2" x2="16" y2="7" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="16" y1="25" x2="16" y2="30" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="2" y1="16" x2="7" y2="16" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="25" y1="16" x2="30" y2="16" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    <div class="brand-text">
+      <h1>AI Model Release Monitor</h1>
+      <p class="tagline">What changed. What fits your stack. What might cost less.</p>
+    </div>
+  </div>
+  <div class="meta">
+    <div class="meta-row"><span class="dot" id="status-dot"></span><span id="status-label" role="status">Connecting</span></div>
+    <div class="meta-row muted">Last refresh: <span id="last-run">—</span></div>
+    <div class="meta-row muted">Next refresh: <span id="next-run">—</span></div>
+  </div>
+</header>
+
+<nav class="project-nav" aria-label="Project resources">
+  <a href="https://docs.google.com/spreadsheets/d/1BNcJ3tfjWyn1awDEeM5Jn5Zqjt_vGwdSmcHMcuZrBbg/edit" target="_blank" rel="noopener">Release tracker</a>
+  <a href="https://docs.google.com/spreadsheets/d/1BNcJ3tfjWyn1awDEeM5Jn5Zqjt_vGwdSmcHMcuZrBbg/edit#gid=1936902919" target="_blank" rel="noopener">Assessment data</a>
+  <button id="reload" type="button">Refresh data</button>
+  <button id="theme-toggle" type="button" aria-label="Switch color theme">Light theme</button>
+</nav>
+<p id="delivery-status" class="privacy-note" role="status" style="padding:0 24px">Connecting to public data feeds. Collection is daily, not continuous.</p>
+
+<main id="dashboard-main">
+<section class="stats">
+  <div class="stat"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Populated records</div></div>
+  <div class="stat"><div class="stat-num" id="stat-7d">—</div><div class="stat-label">Last 7 days</div></div>
+  <div class="stat"><div class="stat-num" id="stat-30d">—</div><div class="stat-label">Last 30 days</div></div>
+  <div class="stat"><div class="stat-num" id="stat-open">—</div><div class="stat-label">Open-license labels</div></div>
+  <div class="stat"><div class="stat-num" id="stat-orgs">—</div><div class="stat-label">Organizations</div></div>
+</section>
+
+<section class="intelligence" aria-labelledby="usefulness-heading">
+  <div class="section-heading">
+    <div><h2 id="usefulness-heading">What deserves your attention</h2>
+    <p>Workflow fit, evidence and a next step. “Test now” means evaluate, not deploy.</p></div>
+    <span id="assessment-coverage" class="coverage">Loading assessments</span>
+  </div>
+  <div class="view-controls" role="group" aria-label="Choose dashboard view">
+    <button class="chip active" data-view="usefulness" aria-pressed="true">Usefulness</button>
+    <button class="chip" data-view="timeline" aria-pressed="false">All releases</button>
+    <button class="chip" data-view="changes" aria-pressed="false">Changes &amp; risks</button>
+    <button class="chip" data-view="stack" aria-pressed="false">My stack</button>
+    <button class="chip" data-view="cost" aria-pressed="false">Cost lab</button>
+    <button class="chip" data-view="sources" aria-pressed="false">Sources</button>
+    <button class="chip" data-view="versions" aria-pressed="false">Versions &amp; access</button>
+  </div>
+  <div id="usefulness-panel">
+    <div class="assessment-controls">
+      <label for="recommendation-filter">Recommendation
+        <select id="recommendation-filter"><option>All reviewed</option><option>Test now</option><option>Watch</option><option>Low priority</option></select>
+      </label>
+      <label for="assessment-search">Find a review
+        <input id="assessment-search" type="search" placeholder="Model, workflow or evidence" />
+      </label>
+      <label for="signal-filter">Decision signal
+        <select id="signal-filter"><option value="all">All signals</option><option value="capability">Capability candidates</option><option value="cost">Cost hypotheses</option><option value="estate">Listed provider / product</option><option value="unknown">Estate unknown</option></select>
+      </label>
+      <label class="check-label"><input type="checkbox" id="only-new" /> Current new releases only</label>
+    </div>
+    <p id="profile-note" class="privacy-note">No stack profile loaded. Estate membership is unknown, not absent.</p>
+    <p id="assessment-status" role="status">Loading the separate assessment feed.</p>
+    <div id="assessment-list"></div>
+    <details class="methodology">
+      <summary>How recommendations work</summary>
+      <p><strong>Test now:</strong> documented access and a concrete workflow fit justify a bounded sandbox evaluation. <strong>Watch:</strong> potential value, with unresolved evidence, cost or deployment constraints. <strong>Low priority:</strong> limited relevance to the current workflow goals.</p>
+      <p>Reviews distinguish publisher claims, independent evidence and hands-on tests. Unknown costs and unmeasured performance remain unknown. Unreviewed records are not automatically classified as low priority. Source release rows are preserved separately.</p>
+      <p>Priority workflows: agent automation, API integration, document processing, coding, real-time monitoring and research. No paid calls, production changes or private-data tests are performed by these reviews.</p>
+    </details>
+  </div>
+</section>
+
+<section id="changes-panel" class="extra-panel" hidden aria-labelledby="changes-heading">
+  <h2 id="changes-heading">Changes that can affect your work</h2>
+  <p>SDKs, developer tools, patches, deprecations, pricing and provider-reported incidents. These are not counted as new model releases.</p>
+  <div class="assessment-controls">
+    <label for="event-type">Event type<select id="event-type"><option>All types</option><option>Patch</option><option>Breaking change</option><option>Deprecation</option><option>API / developer tool</option><option>Pricing change</option><option>Price observation</option><option>Security advisory</option><option>Known issue</option><option>Incident</option><option>Recovery</option></select></label>
+    <label for="event-search">Search changes<input id="event-search" type="search" placeholder="Provider, version or issue" /></label>
+  </div>
+  <p id="event-status" role="status"></p><div id="event-list"></div>
+</section>
+
+<section id="stack-panel" class="extra-panel" hidden aria-labelledby="stack-heading">
+  <h2 id="stack-heading">Your stack, kept separate</h2>
+  <p>Load a small inventory to compare products and providers. Processing stays in this page's memory; this app does not upload or save your profile. Reloading clears it. Do not include keys, credentials, private URLs or customer data.</p>
+  <details><summary>Start without a JSON file: choose your providers</summary><p>Select providers below, then apply. This establishes provider overlap only, not exact model use or account entitlement.</p><div id="provider-picker" class="cost-grid"></div><button id="apply-providers" type="button">Use selected providers</button></details>
+  <div class="stack-layout"><div>
+    <label for="profile-file">Import a profile JSON file<input id="profile-file" type="file" accept=".json,application/json" /></label>
+    <label for="profile-json">Or paste a profile<textarea id="profile-json" rows="9" spellcheck="false" placeholder='{"as_of":"2026-09-19","complete":false,"products":[{"org":"Example provider","name":"Exact product","status":"user-confirmed","version":"1.0"}]}'></textarea></label>
+    <div class="button-row"><button id="apply-profile" type="button">Apply profile</button><button id="clear-profile" type="button">Clear profile</button></div>
+    <p id="profile-status" role="status">No profile loaded.</p>
+  </div><div class="methodology">
+    <h3>What the flags mean</h3>
+    <dl class="flag-definitions">
+      <dt>Exact product listed</dt><dd>A normalized product + provider match in your supplied inventory. This is not a health or usage check.</dd>
+      <dt>Provider overlap</dt><dd>You listed this provider, but not this exact product. A subscription is not proof of API entitlement.</dd>
+      <dt>Not in supplied profile</dt><dd>No match was found. Incomplete inventory cannot establish that something is new to your entire estate.</dd>
+      <dt>Estate unknown</dt><dd>No current profile is available. Profiles older than 30 days are marked stale.</dd>
+    </dl>
+    <p>Accepted statuses: documented, user-confirmed, runtime-verified, historical. A status is supplied by you, not independently verified by this app. Historical entries never count as active overlap.</p>
+  </div></div>
+</section>
+
+<section id="cost-panel" class="extra-panel" hidden aria-labelledby="cost-heading">
+  <h2 id="cost-heading">Compare a cost scenario</h2>
+  <p>Illustrative USD estimates, not measured savings. Use the same workload and acceptable output quality for both routes. Prices, retries and token sizes are your inputs, not live quotes.</p>
+  <form id="cost-form">
+    <div class="cost-grid">
+      <label>Successful tasks / month<input name="tasks" type="number" min="1" value="10000" required /></label>
+      <label>Input tokens / attempt<input name="inputTokens" type="number" min="0" value="2000" required /></label>
+      <label>Output tokens / attempt<input name="outputTokens" type="number" min="0" value="500" required /></label>
+    </div>
+    <div class="cost-routes">
+      <fieldset><legend>Current route</legend>
+        <label>Input USD / million tokens<input name="baseIn" type="number" min="0" step="any" value="2" required /></label>
+        <label>Output USD / million tokens<input name="baseOut" type="number" min="0" step="any" value="8" required /></label>
+        <label>Attempts / successful task<input name="baseAttempts" type="number" min="1" step="any" value="1" required /></label>
+        <label>Other monthly USD costs<input name="baseFixed" type="number" min="0" step="any" value="0" required /></label>
+      </fieldset>
+      <fieldset><legend>Candidate route</legend>
+        <label>Input USD / million tokens<input name="newIn" type="number" min="0" step="any" value="1" required /></label>
+        <label>Output USD / million tokens<input name="newOut" type="number" min="0" step="any" value="4" required /></label>
+        <label>Attempts / successful task<input name="newAttempts" type="number" min="1" step="any" value="1" required /></label>
+        <label>Other monthly USD costs<input name="newFixed" type="number" min="0" step="any" value="0" required /></label>
+      </fieldset>
+    </div>
+    <div class="cost-grid">
+      <label>One-time migration / testing USD<input name="migration" type="number" min="0" step="any" value="0" required /></label>
+      <label>Amortize over months<input name="months" type="number" min="1" step="1" value="6" required /></label>
+    </div>
+    <p>Other costs should include hosting, tool calls, reviewer time and subscriptions. This simple scenario excludes cache/batch tiers, volume discounts, tax and model-specific token differences unless you account for them in the inputs.</p>
+    <button type="submit">Calculate scenario</button>
+  </form>
+  <div id="cost-result" role="status" class="cost-result">Enter your assumptions, then calculate. The prefilled numbers are synthetic examples, not model prices.</div>
+</section>
+
+<section id="sources-panel" class="extra-panel" hidden aria-labelledby="sources-heading">
+  <h2 id="sources-heading">Direct sources and coverage</h2>
+  <p>The broader release scan remains in place. This registry adds explicit developer and operational sources, with check dates and limitations. A daily check is not continuous incident monitoring.</p>
+  <p id="source-status"></p><div id="source-list"></div>
+</section>
+
+<div id="timeline-panel" hidden>
+<section class="controls">
+  <div class="search-wrap">
+    <input id="search" type="search" placeholder="Search by model, org, or capability…" aria-label="Search releases" />
+  </div>
+  <div class="filter-group" id="category-filters" role="group" aria-label="Filter by category"></div>
+  <div class="filter-group" id="license-filters" role="group" aria-label="Filter by license"></div>
+</section>
+
+<div>
+  <div class="table-card">
+    <table class="releases" id="releases-table">
+      <thead>
+        <tr>
+          <th scope="col" aria-sort="descending" data-sort="date" class="sortable sorted-desc"><button type="button">Date</button></th>
+          <th scope="col" aria-sort="none" data-sort="name" class="sortable"><button type="button">Model</button></th>
+          <th scope="col" aria-sort="none" data-sort="org" class="sortable"><button type="button">Org</button></th>
+          <th scope="col" aria-sort="none" data-sort="category" class="sortable"><button type="button">Category</button></th>
+          <th scope="col">Modality</th>
+          <th scope="col" aria-sort="none" data-sort="license" class="sortable"><button type="button">License</button></th>
+          <th scope="col">Highlight</th>
+        </tr>
+      </thead>
+      <tbody id="releases-body">
+        <tr><td colspan="7" class="loading">Loading releases…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p id="empty-msg" class="empty hidden">No releases match your filters.</p>
+</div>
+</div>
+
+<section id="versions-panel" class="extra-panel" hidden aria-labelledby="versions-heading">
+  <h2 id="versions-heading">Current and two previous revisions</h2>
+  <p>Compare documented versions within the same product family, not unrelated model sizes or plan tiers. Older does not automatically mean cheaper, available or supported. The goal is current plus two predecessors; missing history remains explicitly unknown.</p>
+  <label for="version-search">Find a family, version or access tier</label>
+  <input id="version-search" type="search" placeholder="Search documented version history" />
+  <label for="version-access">Access option<select id="version-access"><option value="All">All access options</option><option value="Free">Free API tier</option><option value="Standard">Standard paid API</option><option value="Batch">Paid batch API</option></select></label>
+  <p>History slots show verified generations within the stated family, not a mandatory migration path. Model variants are separate from account tiers. Free API access is not a chat subscription; limits and data-use terms still apply. Prices are dated observations, not quotes or measured savings.</p>
+  <p id="version-status" aria-live="polite"></p>
+  <div id="version-list"></div>
+  <p>Access channels are separate: chat subscription, metered API, downloadable weights, and developer software. A chat plan does not establish API access. No account entitlement or affordability is inferred from a version number.</p>
+</section>
+</main>
+<footer>
+  <p>Free pilot · Daily collection target · Check the last successful scan timestamp</p>
+  <p id="record-note">Counts include populated model + organization records, not blank spreadsheet rows. Historical records have not all been revalidated.</p>
+  <p>Open-license labels are text classifications, not verification of downloadable weights. Feed-provided links are not automatically authenticated; check the destination and publisher before acting.</p>
+</footer>
+<script src="intelligence.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

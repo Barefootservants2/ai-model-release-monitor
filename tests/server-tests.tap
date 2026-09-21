@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: health endpoint identifies read-only mode
+ok 1 - health endpoint identifies read-only mode
+  ---
+  duration_ms: 43.826592
+  type: 'test'
+  ...
+# Subtest: HEAD rejection terminates cleanly
+ok 2 - HEAD rejection terminates cleanly
+  ---
+  duration_ms: 19.830017
+  type: 'test'
+  ...
+# Subtest: mutating methods refused
+ok 3 - mutating methods refused
+  ---
+  duration_ms: 15.11245
+  type: 'test'
+  ...
+# Subtest: unapproved feed refused
+ok 4 - unapproved feed refused
+  ---
+  duration_ms: 7.449074
+  type: 'test'
+  ...
+# Subtest: arbitrary source query refused
+ok 5 - arbitrary source query refused
+  ---
+  duration_ms: 4.478555
+  type: 'test'
+  ...
+# Subtest: unapproved files and paths refused
+ok 6 - unapproved files and paths refused
+  ---
+  duration_ms: 12.510587
+  type: 'test'
+  ...
+# Subtest: public CSV cached without credentials and with exposed timestamps
+ok 7 - public CSV cached without credentials and with exposed timestamps
+  ---
+  duration_ms: 7.084231
+  type: 'test'
+  ...
+# Subtest: parallel same-feed requests coalesce
+ok 8 - parallel same-feed requests coalesce
+  ---
+  duration_ms: 33.875341
+  type: 'test'
+  ...
+# Subtest: HTML disguised as CSV refused
+ok 9 - HTML disguised as CSV refused
+  ---
+  duration_ms: 3.524137
+  type: 'test'
+  ...
+# Subtest: wrong content type refused
+ok 10 - wrong content type refused
+  ---
+  duration_ms: 2.10864
+  type: 'test'
+  ...
+# Subtest: oversize feed refused
+ok 11 - oversize feed refused
+  ---
+  duration_ms: 5.117476
+  type: 'test'
+  ...
+# Subtest: upstream exceptions do not reveal internals
+ok 12 - upstream exceptions do not reveal internals
+  ---
+  duration_ms: 2.383529
+  type: 'test'
+  ...
+# Subtest: malformed request targets return 400 and same server remains healthy
+ok 13 - malformed request targets return 400 and same server remains healthy
+  ---
+  duration_ms: 8.213261
+  type: 'test'
+  ...
+# Subtest: global request budget refuses excess with retry hint
+ok 14 - global request budget refuses excess with retry hint
+  ---
+  duration_ms: 929.00743
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1154.434599
