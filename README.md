@@ -2,11 +2,13 @@
 
 What changed. What fits your stack. What might cost less.
 
-A free, evidence-linked pilot for browsing AI releases, reviewing selected workflow-fit assessments, comparing documented access options, and noticing developer changes. It is a decision aid, not a benchmark leaderboard, vulnerability scanner, purchasing agent, or promise of savings.
+Free, MIT-licensed, user-operated software for browsing AI releases, reviewing selected workflow-fit assessments, comparing documented access options, and noticing developer changes. It is a decision aid, not a benchmark leaderboard, vulnerability scanner, purchasing agent, or promise of savings.
 
 ## Start here
 
-Open the [AI Model Release Monitor](https://ai-release-notes.pplx.app). The free pilot is public and was verified in a signed-out browser on September 20, 2026; this package contains source, instructions, test receipts and unposted media drafts.
+Start with [local setup](docs/SETUP_AND_DEPLOYMENT.md#run-locally). No model-provider login, paid model API, LinkedIn account or n8n account is needed to browse the supplied catalog. You operate your own copy and pay for any infrastructure or separate collection services you choose.
+
+An existing [public demonstration](https://ai-release-notes.pplx.app) was checked on September 20, 2026. It is not a managed-service commitment, guaranteed update feed or substitute for the reviewed source. See [review limitations](docs/REVIEW_SUMMARY.md) for the distinction between corrected local source and the earlier hosted build.
 
 1. **Browse without setup:** Open All releases. Search for a provider, product, or capability, then filter by category and license.
 2. **See selected reviews:** Use Usefulness. “Test now” proposes an evaluation; it does not mean tested or production-approved.
@@ -27,7 +29,9 @@ The monitor keeps three questions separate:
 - **Capability:** Is there a concrete workflow worth evaluating?
 - **Cost:** Is there a plausible mechanism to reduce total cost, with assumptions and unknowns visible?
 
-The public catalog is shared. Your optional stack profile is processed in page memory and is not sent to the application server or saved by the app; reloading resets the active profile.
+The default public catalog is shared. Your optional stack profile is processed in page memory and is not sent to the application server or saved by the app; reloading resets the active profile.
+
+Local hosting alone does not make catalog maintenance independent. The current package reads a configured public Google Sheet and falls back to a dated bundled snapshot if feeds fail. It does not include an installable collector. To maintain your own catalog, configure your own data source and separately funded collection process. No continuing Ashes2Echoes-funded collection or hosting is included.
 
 ## Pilot boundaries
 

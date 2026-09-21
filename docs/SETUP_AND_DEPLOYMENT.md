@@ -1,6 +1,20 @@
 # AI Model Release Monitor: Setup and Deployment
 
-This guide covers using the free public app, running the supplied source locally, deploying a separate copy, and preparing the GitHub/LinkedIn/Instagram launch. The website is already public at [ai-release-notes.pplx.app](https://ai-release-notes.pplx.app); deploying another copy is optional.
+The launch model is free, MIT-licensed software operated by its user. Start locally; use your own hosting account only if you choose to host it. The existing [public demonstration](https://ai-release-notes.pplx.app) is separate from this distribution and does not include a promise of continued hosting, collection, support or update frequency.
+
+No model-provider, LinkedIn or n8n account is required for browsing or selecting your stack. You need Node 22 or newer, a terminal and a browser. Live catalog retrieval requires network access to the configured public Sheet; no Google login is required to read that public feed. An independently maintained catalog requires your own authorized data store and separately configured collector. This package does not install that collector.
+
+## Cost ownership
+
+| Component | Operator and cost responsibility |
+|---|---|
+| Local interface and server | User's computer; no paid model calls made by this app |
+| Optional remote hosting | User's chosen hosting account and applicable charges |
+| Catalog collection and maintenance | Whoever runs the separate collector; not included as a managed service |
+| Evaluating or using a recommended model | User's provider access, compute and applicable charges |
+| Existing public demonstration/feed | Separate owner-operated pilot; availability and future updates are not guaranteed |
+
+Local operation is not fully offline or independent by default: the server attempts shared-feed reads, and the page may load external fonts. A dated bundled snapshot is a fallback, not a background updater. Do not describe this version as air-gapped or as an automatic spreadsheet synchronizer.
 
 ## Choose the right setup
 
@@ -46,7 +60,7 @@ Replace the example with your own non-sensitive product names and a current date
 
 ## Run locally
 
-Use the attached launch ZIP rather than the private Project checkout. Extract it; the top-level directory is `public-launch/`.
+Use the sanitized GitHub source or launch ZIP, never the private Project checkout. Open a terminal in the extracted repository/package root, which contains `app/`.
 
 Prerequisites:
 
@@ -57,7 +71,7 @@ Prerequisites:
 The package declares no third-party runtime dependencies. A lockfile is included, but no install or build step is needed to start this version.
 
 ```sh
-cd public-launch/app
+cd app
 node --version
 node --check app.js
 node --check intelligence.js
@@ -82,6 +96,14 @@ node server.cjs
 ```
 
 Then open `http://localhost:8080`. This changes only your local instance.
+
+The supplied server binds all network interfaces. Keep it behind your operating-system firewall and do not forward its port or expose it publicly by accident. Intentional public hosting needs HTTPS and the acceptance checks below.
+
+## Future reports and user-edited spreadsheets
+
+Paid reports and their cadence are deferred, not offered by this release. No current code writes to a user's Google Sheet or Excel workbook.
+
+Any future import/update feature must preserve user-edited fields, formulas, notes, formatting and working tabs. The proposed design uses a separate dated/import tab, stable record keys, explicit conflicts and user-approved reconciliation rather than overwriting the working sheet. This is a future acceptance requirement, not an implemented guarantee. Weekly versus more frequent reporting remains undecided.
 
 ## Deploy your own Node web service
 
