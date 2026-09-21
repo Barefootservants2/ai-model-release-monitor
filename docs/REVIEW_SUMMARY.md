@@ -5,7 +5,7 @@ Prepared September 20, 2026 for the free pilot. This is a producer summary of an
 ## Defined checks
 
 - **Browser:** 41 assertions passed, covering seven-feed delivery, filters, selected revision/access groups, private profiles, input refusal, synthetic cost arithmetic, mobile layouts, fallback states, and keyboard sorting.
-- **Server:** 13 tests passed, covering read-only methods, fixed routes, caching, concurrent-request coalescing, upstream response bounds, error handling, private-path rejection, and request-budget refusal.
+- **Server:** The original 13 tests passed. The source-launch revision now passes 14 tests on Node 22.23.2, adding invalid-request refusal and same-process health recovery to the existing routing, caching, response bounds, private-path and request-budget checks.
 - **Syntax:** Both browser scripts and the Node server passed Node syntax checks.
 - **Dependency audit:** A generated lockfile is included. `npm audit --json` reported zero vulnerabilities; there are no declared third-party runtime dependencies.
 - **Data safety:** An exact readback compared the six unchanged tracker tabs and the three preserved SDK version rows after the additive comparison update.
@@ -21,6 +21,10 @@ Six additional probes passed: health returned 200, unknown feed and unexpected q
 Receipts are `tests/publication-test-results.json` and `tests/publication-production-receipt.json`. Signed-out top-level production use was verified; third-party iframe embedding, uptime and sustained-load resilience were not. These are producer checks, not an independent approval of the published deployment.
 
 ## Independent finding status
+
+The later source-launch review identified a request-handling availability blocker not covered by the original suite. The source package now adds request-target validation, a listener error boundary and a raw-request regression; an independent follow-up is required before merge. This source correction has not been republished to the existing hosted pilot, and the prior production receipts do not verify it.
+
+The source workflow pins reviewed action commit IDs, disables checkout credential persistence and tests Node 22. The optional `examples/stack-profile.json` is a synthetic example with “Example provider” and “Exact product”, not the owner's inventory.
 
 The follow-up reviewed implementation commit `285b45f` and returned WARN with no BLOCK findings. The producer's subsequent commit `41df43b` added the lockfile and an explicit overdue-collection label; the follow-up is not represented as an independent review of that later commit.
 

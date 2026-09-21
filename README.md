@@ -62,7 +62,7 @@ Browser-test procedures and the test evidence shipped with this package are docu
 
 ## Deploy your own copy
 
-See [Customization](docs/CUSTOMIZE.md). Outside Perplexity, replace the `__PORT_5000__` placeholder logic with a same-origin API base, run the Node server behind HTTPS, and keep the public feed allowlist fixed.
+See [Customization](docs/CUSTOMIZE.md). The supplied `__PORT_5000__` expression falls back to same-origin outside Perplexity; run the Node server behind HTTPS and keep the public feed allowlist fixed.
 
 The scheduled discovery workflow is separate from the website. Copying or hosting this source does not create a collector, scheduler, provider account, or notification service.
 
@@ -71,7 +71,7 @@ The scheduled discovery workflow is separate from the website. Copying or hostin
 1. Confirm the public pilot URL and access settings in a signed-out browser.
 2. The owner selected the [MIT license](LICENSE) for this project. Preserve the license notice; third-party models, source publications and vendor marks retain their own terms.
 3. Review the files being uploaded. Publish this package only, not the private Project, estate profile, work ledger, credentials, or internal backups.
-4. Configure a private vulnerability-reporting route before opening public security intake.
+4. Private vulnerability reporting is enabled for the approved repository; configure your own private route when forking.
 5. Run tests in the intended hosting environment.
 6. Keep source attribution and third-party terms. Do not imply sponsorship by any listed vendor.
 

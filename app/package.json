@@ -4,6 +4,6 @@
   "license": "MIT",
   "private": true,
   "description": "Read-only public AI release intelligence pilot",
-  "engines": {"node": ">=20"},
+  "engines": {"node": ">=22"},
   "scripts": {"start": "node server.cjs", "test": "node --test test-server.cjs"}
 }

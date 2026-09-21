@@ -13,6 +13,8 @@ Prepared September 20, 2026. This package contains source, documentation, test e
 - Request limits, upstream coalescing, response bounds, read-only methods, input validation, escaped rendering, and a restrictive script policy.
 - 41 browser assertions and 13 server tests passed in the local validation run.
 
+The subsequent source-launch correction passes 14 server tests on Node 22.23.2, including invalid-request refusal and health recovery. Browser and hosted receipts above remain historical evidence for the earlier build; the corrected source is not yet the published pilot.
+
 ## Coverage and freshness
 
 The September 20 tracker readback contains 268 populated release rows, 4 selected desk reviews, 10 technical events, 8 registered direct-source endpoints, and 29 version/access offerings across 8 groups. These are Gemini Flash, GPT-5.6 variants, Gemini Flash-Lite, OpenAI Python SDK, Step 5, Codex CLI, Hugging Face Hub, and Claude Code. Five groups have documented current-plus-two-predecessor slots; variants and access tiers are not treated as predecessors. These are point-in-time counts, not exhaustive coverage.
@@ -36,6 +38,8 @@ This is not a formal penetration-test certification or accessibility-conformance
 No paid model calls, private-data experiments, production patches, purchases, or payment features were executed. No measured savings are claimed.
 
 ## Independent review and remediation
+
+The later launch-package review found a request-handling availability blocker. A source-only correction and regression are prepared; merge is held pending independent follow-up and owner authorization. The hosted pilot has not been republished with this correction.
 
 The independent follow-up returned WARN with no BLOCK findings. It rechecked the server tests, local seven-feed delivery, profile privacy, XSS refusal, input bounds, CSP, accessible sorting, and corrected license labeling.
 

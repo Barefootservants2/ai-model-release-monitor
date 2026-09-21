@@ -26,7 +26,7 @@ async function getFeed(tab) {
   pending.set(tab,promise);
   try{return await promise;}finally{pending.delete(tab);}
 }
-const server=http.createServer(async(req,res)=>{
+async function handleRequest(req,res){
   res.setHeader('Access-Control-Allow-Origin','*');
   res.setHeader('Access-Control-Allow-Methods','GET, OPTIONS');
   res.setHeader('Access-Control-Expose-Headers','X-Feed-Fetched-At, X-Feed-Cache');
@@ -38,7 +38,15 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==='HEAD'){res.writeHead(405,{Allow:'GET, OPTIONS','Content-Length':'0'});return res.end();}
   if(req.method==='OPTIONS'){res.writeHead(204);return res.end();}
   if(req.method!=='GET'){res.writeHead(405,{Allow:'GET, OPTIONS'});return res.end('Read only');}
-  const url=new URL(req.url,'http://localhost');
+  let url;
+  try {
+    if(typeof req.url!=='string'||!req.url.startsWith('/')||req.url.startsWith('//'))throw Error('Invalid target');
+    url=new URL(req.url,'http://localhost');
+    if(url.origin!=='http://localhost')throw Error('Invalid origin');
+  } catch {
+    res.writeHead(400,{'Content-Type':'text/plain; charset=utf-8','Connection':'close'});
+    return res.end('Invalid request target');
+  }
   if(url.pathname==='/api/health'){res.writeHead(200,{'Content-Type':'application/json'});return res.end(JSON.stringify({status:'ok',mode:'public-read-only',cache_seconds:60}));}
   const match=url.pathname.match(/^\/api\/feeds\/([a-z]+)$/);
   if(match){
@@ -60,6 +68,13 @@ const server=http.createServer(async(req,res)=>{
     res.writeHead(200,{'Content-Type':({'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'})[ext]});
     return res.end(body);
   }catch{res.writeHead(404);res.end('Not found');}
+}
+const server=http.createServer((req,res)=>{
+  handleRequest(req,res).catch(()=>{
+    if(res.headersSent){res.destroy();return;}
+    res.writeHead(500,{'Content-Type':'text/plain; charset=utf-8','Connection':'close'});
+    res.end('Request failed');
+  });
 });
 server.headersTimeout=10000;
 server.requestTimeout=20000;

@@ -24,6 +24,8 @@ Verify that a successful delivery timestamp does not replace the collection time
 
 An independent review is part of launch preparation. Preserve the dated review and remediation receipts; do not call a bounded code review a penetration-test certification.
 
+The current source suite contains 14 tests, including a raw malformed-request regression followed by a successful health check in the same server process. The source-launch run used Node 22.23.2. Earlier browser JSON files preserve prior observations and are not an executable browser harness; use the manual acceptance procedure above for a new deployment.
+
 The completed follow-up and remaining limits are summarized in [Review and validation](REVIEW_SUMMARY.md). The included lockfile enables `npm audit --json`; its current result is saved under `tests/dependency-audit.json`, separately from application-security testing.
 
 Load testing, formal accessibility conformance, provider-terms/legal review, operational monitoring, full historical catalog auditing, and complete multi-provider pricing coverage remain separate work.

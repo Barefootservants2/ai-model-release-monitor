@@ -1,5 +1,6 @@
 const {test,after}=require('node:test');
 const assert=require('node:assert/strict');
+const net=require('node:net');
 const {server}=require('./server.cjs');
 const nativeFetch=global.fetch;
 let calls=0;
@@ -26,4 +27,16 @@ test('HTML disguised as CSV refused',async()=>{global.fetch=async()=>new Respons
 test('wrong content type refused',async()=>{global.fetch=async()=>new Response('x,y',{headers:{'Content-Type':'text/html'}});assert.equal((await call('/api/feeds/events')).status,502);});
 test('oversize feed refused',async()=>{global.fetch=async()=>new Response('x'.repeat(2*1024*1024+1),{headers:{'Content-Type':'text/csv'}});assert.equal((await call('/api/feeds/sources')).status,502);});
 test('upstream exceptions do not reveal internals',async()=>{global.fetch=async()=>{throw Error('synthetic-private-details');};const r=await call('/api/feeds/versions');assert.equal(r.status,502);assert.ok(!(await r.text()).includes('synthetic-private-details'));});
+test('malformed request targets return 400 and same server remains healthy',async()=>{
+ await ready;
+ for(const target of ['http://[','//example.invalid/api/health','http://example.invalid/api/health']){
+  const response=await new Promise((resolve,reject)=>{
+   const socket=net.connect(server.address().port,'127.0.0.1',()=>socket.write(`GET ${target} HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n`));
+   let text='';socket.setTimeout(2000,()=>socket.destroy(Error('Local request timeout')));
+   socket.on('data',chunk=>text+=chunk);socket.on('error',reject);socket.on('end',()=>resolve(text));
+  });
+  assert.match(response,/^HTTP\/1\.1 400 /);
+  assert.equal((await call('/api/health')).status,200);
+ }
+});
 test('global request budget refuses excess with retry hint',async()=>{let limited=false;for(let i=0;i<620;i++){const r=await call('/api/health');if(r.status===429){assert.equal(r.headers.get('retry-after'),'60');limited=true;break;}}assert.ok(limited);});

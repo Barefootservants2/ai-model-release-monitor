@@ -147,6 +147,8 @@ Check in a signed-out browser:
 
 The September 20 production receipt records 41 browser checks and six endpoint probes passing; the packaged server suite also passed 13 tests. Those are point-in-time producer checks, not an uptime promise or comprehensive security certification.
 
+The source-launch revision subsequently adds request-target hardening and passes 14 server tests on Node 22.23.2. It requires independent follow-up and owner merge approval; the prior hosted pilot has not been republished with this correction. Verify your deployed revision rather than applying the earlier production receipt to newer source.
+
 The shared 600-request/minute budget does not isolate clients. Add reviewed edge protections before broad scale; do not disable the limit simply to suppress errors.
 
 ## Use your own public catalog
