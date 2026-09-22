@@ -10,6 +10,15 @@ test('malformed CSV structures fail closed',()=>{
  assert.throws(()=>v.objects(csv,'releases'));
 });
 test('duplicate metadata keys fail closed',()=>assert.throws(()=>v.objects('key,value\nlast_run,a\nlast_run,b','meta')));
+test('partially populated optional-feed records fail closed',()=>{
+ for(const [tab,csv] of [
+  ['assessments','name,org,recommendation\nModel,Example,'],
+  ['signals','name,org,cost_flag\nModel,Example,'],
+  ['events','event_id,event_type\nid,'],
+  ['sources','source_id,url\nid,'],
+  ['versions','family,version,access_channel\nFamily,1,']
+ ])assert.throws(()=>v.objects(csv,tab));
+});
 test('known blank Sheet flags are excluded without admitting partial records',()=>{
  assert.deepEqual(v.objects('name,org,is_new\n,,FALSE\nModel,Example,FALSE','releases'),[{name:'Model',org:'Example',is_new:'FALSE'}]);
  assert.throws(()=>v.objects('name,org,is_new\n,,FALSE','releases'));

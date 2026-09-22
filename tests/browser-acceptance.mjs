@@ -186,6 +186,11 @@ for(const [name,overrides,pattern] of [
   ,['extra CSV columns',{releases:{raw:'name,org\none,Example,extra'}},/Saved snapshot/]
   ,['blank required record',{releases:[{name:'',org:'Example'}]},/Saved snapshot/]
   ,['mismatched catalog count',{meta:[{key:'last_run',value:new Date().toISOString()},{key:'total_count',value:'999999'}]},/Saved snapshot/]
+  ,['incomplete assessments',{assessments:[{name:'Model',org:'Example',recommendation:''}]},/Partial/]
+  ,['incomplete signals',{signals:[{name:'Model',org:'Example',cost_flag:''}]},/Partial/]
+  ,['incomplete events',{events:[{event_id:'id',event_type:''}]},/Partial/]
+  ,['incomplete sources',{sources:[{source_id:'id',url:''}]},/Partial/]
+  ,['incomplete versions',{versions:[{family:'Family',version:'1',access_channel:''}]},/Partial/]
 ]){
   await check(`${name} never presents complete live success`,async()=>{
     const s=await open(overrides);try{assert.match(await s.page.locator('#status-label').innerText(),pattern);assert.equal(await s.page.locator('#status-dot').evaluate(e=>e.classList.contains('live')),false);}finally{await s.context.close();}

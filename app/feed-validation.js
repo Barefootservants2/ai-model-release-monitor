@@ -41,6 +41,7 @@
     // Ignore only these known placeholders, never partially populated records.
     if(tab==='releases')result=result.filter(r=>!Object.entries(r).every(([k,value])=>!value||(k==='is_new'&&value==='FALSE')));
     if(tab==='releases'&&(!result.length||result.some(r=>!r.name||!r.org)))throw Error('Release records unavailable');
+    if(tab!=='meta'&&result.some(r=>!schemas[tab].every(key=>r[key])))throw Error('Required feed field empty');
     if(tab==='meta'&&new Set(result.map(r=>r.key)).size!==result.length)throw Error('Duplicate metadata key');
     return result;
   }
@@ -57,7 +58,7 @@
       if(!Array.isArray(records)||records.length>12000)throw Error('Invalid snapshot records');
       if(records.some(r=>!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).length>30||
         Object.values(r).some(v=>typeof v!=='string'||v.length>20000)||
-        !required.every(k=>typeof r[k]==='string')))throw Error('Invalid snapshot schema');
+        !required.every(k=>typeof r[k]==='string'&&r[k].trim())))throw Error('Invalid snapshot schema');
     }
     if(!value.releases.length||value.releases.some(r=>!r.name||!r.org))throw Error('Empty snapshot');
     return value;
