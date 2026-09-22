@@ -1,0 +1,15 @@
+{
+  "name": "ai-model-release-monitor-validation",
+  "private": true,
+  "scripts": {
+    "test": "node --test app/test-server.cjs app/test-validation.cjs",
+    "test:browser": "node tests/browser-acceptance.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.63.0"
+  }
+}

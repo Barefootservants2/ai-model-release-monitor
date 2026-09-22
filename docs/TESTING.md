@@ -24,7 +24,23 @@ Verify that a successful delivery timestamp does not replace the collection time
 
 An independent review is part of launch preparation. Preserve the dated review and remediation receipts; do not call a bounded code review a penetration-test certification.
 
-The current source suite contains 14 tests, including a raw malformed-request regression followed by a successful health check in the same server process. The source-launch run used Node 22.23.2. Earlier browser JSON files preserve prior observations and are not an executable browser harness; use the manual acceptance procedure above for a new deployment.
+The September 22 candidate has repeatable server, data-validation, browser and automated accessibility tests. Earlier JSON receipts are historical and must not be treated as results for this candidate.
+
+From the repository root with Node 22 or newer:
+
+```sh
+npm ci
+npx playwright install chromium
+npm test
+# In another terminal: node app/server.cjs
+npm run test:browser
+```
+
+Browser output defaults to `test-output/browser/` (git-ignored). `TEST_URL` and `TEST_OUTPUT` can override the target and receipt directory. The browser harness supplies synthetic public-feed fixtures, tests all seven views at 1440px and 375px, exercises profiles/costs/filters, and runs axe WCAG A/AA checks. Its timestamps are fixtures, not collector evidence. Public data delivery must also be checked without mocks.
+
+Refusal cases cover malformed quoting, duplicate headers and metadata, extra columns, empty primary feeds, partially populated records, catalog count mismatch, future/stale dates, invalid snapshots, insecure links, and failed-refresh status. Known spreadsheet placeholders containing only `is_new=FALSE` are excluded, not counted as catalog records.
+
+`/api/health` reports a SHA-256 fingerprint over named source-file hashes. Compare it with the reviewed build; HTTP 200 alone does not prove a deployed revision. Socket-address quotas do not establish trusted end-user quotas behind a shared reverse proxy. Confirm the host's edge controls before scaling traffic.
 
 The completed follow-up and remaining limits are summarized in [Review and validation](REVIEW_SUMMARY.md). The included lockfile enables `npm audit --json`; its current result is saved under `tests/dependency-audit.json`, separately from application-security testing.
 
