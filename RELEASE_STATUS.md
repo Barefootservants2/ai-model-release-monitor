@@ -1,5 +1,15 @@
 # Pilot release status
 
+## September 22 rollout candidate
+
+This candidate adds strict shared CSV validation, semantic primary-feed checks, catalog-count reconciliation, future-timestamp refusal, validated bounded snapshots, explicit failed-delivery labels, HTTPS-only credential-free evidence links, and underlined links for accessibility. It also adds repeatable browser/axe tests and a build fingerprint.
+
+The former 600-request process-global budget is replaced by bounded socket-address quotas for valid feed routes and a separate 6,000-request process circuit breaker. Health, static resources and rejected routes do not consume feed quotas. A shared proxy can still group visitors under one socket identity; trusted edge quotas and sustained-load acceptance remain a hosting gate.
+
+These are candidate source changes, not evidence that the public demonstration has been republished. The collector's latest confirmed success remains September 20 until a new collection/write/readback receipt establishes otherwise. Do not equate feed delivery, editable-account permissions, or a test fixture with successful collection.
+
+The following sections preserve historical release evidence and are not a signoff for the September 22 candidate.
+
 Prepared September 20, 2026. This package contains source, documentation, test evidence, and media drafts; it does not mean a repository or social post has been published.
 
 ## Implemented and tested

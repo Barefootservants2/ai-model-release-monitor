@@ -22,3 +22,19 @@ jobs:
           node --check intelligence.js
           node --check server.cjs
           node --test test-server.cjs
+          node --test test-validation.cjs
+      - name: Install browser test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm audit --audit-level=high
+      - name: Browser acceptance and automated accessibility
+        run: |
+          node app/server.cjs &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5000/api/health; then break; fi
+            sleep 1
+          done
+          npm run test:browser

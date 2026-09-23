@@ -2,10 +2,18 @@
 const http=require('node:http');
 const fs=require('node:fs/promises');
 const path=require('node:path');
+const crypto=require('node:crypto');
+const fsSync=require('node:fs');
+const validation=require('./feed-validation.js');
+const {createLimiter}=require('./rate-limit.cjs');
 const SHEET='1BNcJ3tfjWyn1awDEeM5Jn5Zqjt_vGwdSmcHMcuZrBbg';
 const TABS=new Set(['releases','meta','assessments','signals','events','sources','versions']);
 const STATIC=new Map([['/','index.html'],['/index.html','index.html'],['/app.js','app.js'],['/intelligence.js','intelligence.js'],['/styles.css','styles.css'],['/snapshot.json','snapshot.json']]);
 const cache=new Map(), pending=new Map();
+STATIC.set('/feed-validation.js','feed-validation.js');
+const publicFiles=['index.html','app.js','intelligence.js','feed-validation.js','styles.css','snapshot.json','server.cjs','rate-limit.cjs'];
+const build=crypto.createHash('sha256').update(publicFiles.map(file=>file+':'+crypto.createHash('sha256').update(fsSync.readFileSync(path.join(__dirname,file))).digest('hex')).join('\n')).digest('hex');
+const allowRequest=createLimiter();
 const MAX_BYTES=2*1024*1024, TTL=60000;
 let windowStart=Date.now(),requestCount=0;
 async function getFeed(tab) {
@@ -20,6 +28,7 @@ async function getFeed(tab) {
     for await(const part of response.body){bytes+=part.length;if(bytes>MAX_BYTES)throw Error('Feed size exceeded');parts.push(part);}
     const body=Buffer.concat(parts).toString('utf8');
     if(!body||/^\s*</.test(body))throw Error('Invalid upstream content');
+    validation.objects(body,tab);
     const value={body,time:Date.now(),cached:false};
     cache.set(tab,value);return value;
   })();
@@ -33,8 +42,6 @@ async function handleRequest(req,res){
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.perplexity.ai https://*.pplx.app; object-src 'none'; base-uri 'none'; form-action 'none'");
-  if(Date.now()-windowStart>60000){windowStart=Date.now();requestCount=0;}
-  if(++requestCount>600){res.writeHead(429,{'Retry-After':'60','Content-Length':'0'});return res.end();}
   if(req.method==='HEAD'){res.writeHead(405,{Allow:'GET, OPTIONS','Content-Length':'0'});return res.end();}
   if(req.method==='OPTIONS'){res.writeHead(204);return res.end();}
   if(req.method!=='GET'){res.writeHead(405,{Allow:'GET, OPTIONS'});return res.end('Read only');}
@@ -47,10 +54,12 @@ async function handleRequest(req,res){
     res.writeHead(400,{'Content-Type':'text/plain; charset=utf-8','Connection':'close'});
     return res.end('Invalid request target');
   }
-  if(url.pathname==='/api/health'){res.writeHead(200,{'Content-Type':'application/json'});return res.end(JSON.stringify({status:'ok',mode:'public-read-only',cache_seconds:60}));}
+  if(url.pathname==='/api/health'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify({status:'ok',mode:'public-read-only',cache_seconds:60,build_sha256:build}));}
   const match=url.pathname.match(/^\/api\/feeds\/([a-z]+)$/);
   if(match){
     if(!TABS.has(match[1])||url.search){res.writeHead(400);return res.end('Unsupported feed request');}
+    if(Date.now()-windowStart>=60000){windowStart=Date.now();requestCount=0;}
+    if(!allowRequest(req.socket.remoteAddress)||++requestCount>6000){res.writeHead(429,{'Retry-After':'60','Content-Length':'0'});return res.end();}
     try{
       const result=await getFeed(match[1]);
       res.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Cache-Control':'no-store','X-Feed-Fetched-At':new Date(result.time).toISOString(),'X-Feed-Cache':result.cached?'hit':'miss'});

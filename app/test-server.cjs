@@ -39,4 +39,12 @@ test('malformed request targets return 400 and same server remains healthy',asyn
   assert.equal((await call('/api/health')).status,200);
  }
 });
-test('global request budget refuses excess with retry hint',async()=>{let limited=false;for(let i=0;i<620;i++){const r=await call('/api/health');if(r.status===429){assert.equal(r.headers.get('retry-after'),'60');limited=true;break;}}assert.ok(limited);});
+test('malformed release CSV rejected before caching',async()=>{
+ for(const body of ['name,org\n','name,name,org\none,two,org','name,org\n"unclosed,org','name,org\none,org,extra']){
+  assert.throws(()=>require('./feed-validation.js').objects(body,'releases'));
+ }
+ global.fetch=async()=>new Response('event_id,event_type\n"unclosed,value',{headers:{'Content-Type':'text/csv'}});
+ assert.equal((await call('/api/feeds/events')).status,502);
+});
+test('build fingerprint is available without exposing source',async()=>assert.match((await(await call('/api/health')).json()).build_sha256,/^[a-f0-9]{64}$/));
+test('socket request budget refuses excess but preserves health',async()=>{let limited=false;for(let i=0;i<140;i++){const r=await call('/api/feeds/releases');if(r.status===429){assert.equal(r.headers.get('retry-after'),'60');limited=true;break;}}assert.ok(limited);assert.equal((await call('/api/health')).status,200);});

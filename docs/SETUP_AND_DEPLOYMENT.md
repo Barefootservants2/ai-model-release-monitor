@@ -77,6 +77,7 @@ node --check app.js
 node --check intelligence.js
 node --check server.cjs
 node --test test-server.cjs
+node --test test-validation.cjs
 node server.cjs
 ```
 
@@ -135,6 +136,10 @@ Deployment steps:
 The supplied `API_BASE` expression falls back to same-origin when the Perplexity-specific placeholder is not rewritten. For a separately maintained, non-Perplexity copy, explicitly using `const API_BASE = '';` in `app.js` is also supported by this design.
 
 Keep the server's fixed `TABS` and `STATIC` allowlists. Do not add an arbitrary `url` or spreadsheet parameter to API requests.
+
+Keep `feed-validation.js` and `rate-limit.cjs` beside the server. For split static/backend hosting, publish only `index.html`, `styles.css`, `app.js`, `intelligence.js`, `feed-validation.js`, and `snapshot.json` as static assets. Never expose the repository root as a static directory. The backend retains all required modules.
+
+The source candidate applies 120 feed requests per socket address per minute, a bounded 4,096-identity table and a separate 6,000-feed-request process circuit breaker. Forwarded headers are deliberately not trusted. Behind a platform proxy, visitors may share a socket identity; independently configure and test trusted edge quotas before broad rollout. Do not describe this as verified per-user isolation.
 
 This is a proposed deployment recipe for your chosen host, not a claim that a separate host has been deployed or tested. Hosting charges and service limits depend on that host; the free public utility does not guarantee free infrastructure.
 
