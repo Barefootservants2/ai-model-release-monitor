@@ -363,4 +363,5 @@ dd { margin: 0; color: var(--text-muted); }
  .decision-flag {max-width:100%;overflow-wrap:anywhere;}
 }
 :focus-visible { outline: 2px solid #0b9fbf; outline-offset: 3px; }
+a { text-decoration: underline; text-underline-offset: .16em; }
 th.sortable button { background: transparent; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; text-align: left; }

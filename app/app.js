@@ -28,39 +28,6 @@ const state = {
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-// Minimal CSV parser supporting quoted fields with embedded commas/quotes
-function parseCSV(text) {
-  const rows = [];
-  let row = [], field = '', inQ = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQ) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else { inQ = false; }
-      } else field += c;
-    } else {
-      if (c === '"') inQ = true;
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c === '\r') { /* skip */ }
-      else field += c;
-    }
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row); }
-  return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
-}
-
-function rowsToObjects(rows) {
-  if (!rows.length) return [];
-  const header = rows[0].map(h => h.trim().replace(/^\uFEFF/, ''));
-  return rows.slice(1).map(r => {
-    const o = {};
-    header.forEach((h, i) => { o[h] = (r[i] || '').trim(); });
-    return o;
-  });
-}
-
 async function load() {
   if (state.loading) return;
   state.loading = true;
@@ -78,9 +45,10 @@ async function load() {
       fetchRows(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=versions`, ['family','version','access_channel']),
     ]);
     if (relResult.status !== 'fulfilled') throw new Error('Release feed unavailable');
-    const releases = relResult.value.filter(r => r.name && r.org);
+    const releases = relResult.value;
     const metaObj = {};
     if (metaResult.status === 'fulfilled') metaResult.value.forEach(r => { if (r.key) metaObj[r.key] = r.value; });
+    if (metaObj.total_count && (!/^\d+$/.test(metaObj.total_count) || Number(metaObj.total_count)!==releases.length)) throw Error('Release count does not match metadata');
     state.assessments = assessmentResult.status === 'fulfilled' ? assessmentResult.value.filter(r => r.name && r.org) : [];
     state.assessmentError = assessmentResult.status === 'fulfilled' ? '' : 'Assessment feed unavailable. The release timeline is still accessible; use Refresh data to retry.';
     state.signals = signalResult.status === 'fulfilled' ? signalResult.value.filter(r=>r.name&&r.org) : [];
@@ -94,10 +62,9 @@ async function load() {
       next_run_label: metaObj.next_run_label || 'Schedule unavailable',
     };
     state.releases = releases;
-    const scanTime = Date.parse(metaObj.last_run);
-    const stale = !Number.isFinite(scanTime) || Date.now() - scanTime > 25 * 3600000;
+    const stale = !FeedValidation.fresh(metaObj.last_run);
     $('#status-label').textContent = state.feedChecks.length < 7 ? 'Partial feeds connected' : stale ? 'Feeds loaded · scan time stale or unknown' : 'Live public feeds connected';
-    $('#delivery-status').textContent = `${state.feedChecks.length}/7 feeds retrieved · delivery cache up to 60 seconds. ${state.feedChecks.map(f=>f.fetched_at).filter(Boolean).sort().at(-1)||'Direct retrieval just completed'}. Collection is daily, not continuous.`;
+    $('#delivery-status').textContent = `${state.feedChecks.length}/7 feeds retrieved · delivery cache up to 60 seconds. ${state.feedChecks.map(f=>f.fetched_at).filter(Boolean).sort().at(-1)||'Direct retrieval just completed'}. Daily collection is a target; scheduler operation is not verified here.`;
     $('#status-dot').classList.toggle('live', !stale && state.feedChecks.length === 7);
     if(stale)state.data.next_run_label='Daily target; last successful scan overdue or unknown';
     if (/tomorrow/i.test(state.data.next_run_label) && metaObj.last_run) {
@@ -110,9 +77,9 @@ async function load() {
     console.error(err);
     if (!state.releases.length) {
       try {
-        const response = await fetch('snapshot.json');
+        const response = await fetch('snapshot.json',{signal:AbortSignal.timeout(18000)});
         if (!response.ok) throw new Error('Snapshot unavailable');
-        const snapshot = await response.json();
+        const snapshot = FeedValidation.snapshot(JSON.parse(await boundedText(response)));
         state.releases = snapshot.releases;
         state.assessments = snapshot.assessments;
         state.signals = snapshot.signals || [];
@@ -120,7 +87,7 @@ async function load() {
         state.sources = snapshot.sources || [];
         state.versions = snapshot.versions || [];
         state.extendedWarning = `Saved snapshot from ${snapshot.captured_at}; not live.`;
-        state.data = {last_run_label: snapshot.captured_at + ' (snapshot)', next_run_label: 'Check Project schedule'};
+        state.data = {last_run_label: snapshot.captured_at + ' (snapshot)', next_run_label: 'Schedule unverified'};
         state.assessmentError = `Live Sheet connection failed. Showing the saved ${snapshot.captured_at} snapshot; open the tracker for current data.`;
         init();
         $('#status-label').textContent = 'Saved snapshot · not live';
@@ -130,6 +97,7 @@ async function load() {
       } catch (snapshotError) { console.error(snapshotError); }
     }
     $('#status-label').textContent = state.releases.length ? 'Refresh failed · previous data shown' : 'Feed unavailable';
+    $('#delivery-status').textContent = state.releases.length ? 'Refresh failed. Previous data remains visible; it is not a successful current delivery.' : 'Delivery unavailable. No validated live feed or saved snapshot could be loaded.';
     $('#status-dot').classList.remove('live');
     $('#assessment-status').textContent = 'Could not refresh data. Use Refresh data to retry or open the tracker directly.';
     if (!state.releases.length) $('#assessment-coverage').textContent = 'Assessments unavailable';
@@ -140,21 +108,22 @@ async function load() {
   }
 }
 
+async function boundedText(response) {
+  const reader=response.body.getReader(),decoder=new TextDecoder();let text='',bytes=0;
+  for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>2*1024*1024){await reader.cancel();throw Error('Feed exceeds size limit');}text+=decoder.decode(value,{stream:true});}
+  text+=decoder.decode();
+  return text;
+}
 async function fetchRows(url, expectedHeaders) {
   const tab=new URL(url).searchParams.get('sheet');
   const delivery='server';
   const response=await fetch(`${API_BASE}/api/feeds/${encodeURIComponent(tab)}`,{cache:'no-store',signal:AbortSignal.timeout(18000)});
   if (!response.ok) throw new Error('Feed request failed');
-  const reader=response.body.getReader(),decoder=new TextDecoder();let text='',bytes=0;
-  for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>2*1024*1024){await reader.cancel();throw Error('Feed exceeds size limit');}text+=decoder.decode(value,{stream:true});}
-  text+=decoder.decode();
+  const text=await boundedText(response);
   if (/^\s*</.test(text)) throw new Error('Feed returned HTML instead of CSV');
-  const rows = parseCSV(text);
-  if(rows.length>12000||rows.some(r=>r.length>30||r.some(v=>v.length>20000)))throw Error('Feed exceeds record limits');
-  const header = (rows[0] || []).map(x => x.trim().replace(/^\uFEFF/, ''));
-  if (!expectedHeaders.every(x => header.includes(x))) throw new Error('Feed header mismatch');
+  const rows = FeedValidation.objects(text,tab);
   state.feedChecks.push({tab,delivery,fetched_at:response.headers.get('X-Feed-Fetched-At')});
-  return rowsToObjects(rows);
+  return rows;
 }
 
 function init() {
@@ -318,7 +287,7 @@ function escapeHtml(s) {
 function escapeAttr(s) { return escapeHtml(s); }
 
 function safeUrl(value) {
-  try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : ''; } catch { return ''; }
+  try { const u = new URL(value); return u.protocol==='https:'&&!u.username&&!u.password ? u.href : ''; } catch { return ''; }
 }
 function recordKey(r) { return `${r.name.trim().toLowerCase()}|${r.org.trim().toLowerCase()}`; }
 function renderAssessments() {
